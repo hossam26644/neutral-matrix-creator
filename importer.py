@@ -8,45 +8,8 @@ from blist import blist
 class Importer(object):
 
     def __init__(self, filepath):
-        self.filepath = "./" + filepath + "/"
+        self.filepath = ""
 
-    def import_quintuplets(self):
-        ''' quiruples are the pentamers context
-        '''
-        filename = self.filepath + "quintuplets.txt"
-        fin = open(filename)
-        lines = fin.readlines()
-        fin.close()
-        return [line.strip().split()[0] for line in lines]
-
-    def import_special_genes(self, filename):
-        ''' special genes are cancer genes, essential genes and zero genes
-            the assumption is that they won't have neutral background
-        '''
-        filename = self.filepath + filename
-        fin = open(filename)
-        lines = fin.readlines()
-        fin.close()
-
-        c_genes = set()
-        for line in lines:
-            c_genes.add(line.strip().split()[0])
-        return c_genes
-
-    def import_context_freqs(self, filename):
-        ''' the precalculated triplets occurence frequencies
-        '''
-        filename = self.filepath + filename
-        fin = open(filename)
-        lines = fin.readlines()
-        fin.close()
-        occs = []
-
-        for line in lines:
-            field = line.strip().split()
-            occs.append(float(field[1]))
-
-        return occs
 
     def import_maf_data(self, filename, context_mode, triplets_map):
         '''	(1)	Import mutation annotation file (maf) including header line, "context" is 0-based.
@@ -58,7 +21,7 @@ class Importer(object):
             returns the mutation array: array of dictionaries, one per each input file line
             keys are the names of the fileds, attributes are gene name, mutation type, and the context
         '''
-        fin = open("./" + filename)
+        fin = open(filename)
         lines = fin.readlines()
         fin.close()
         mut_array = []
@@ -108,13 +71,6 @@ class Importer(object):
         sys.stderr.write("\n")
         return c_genes[1:]
 
-    def import_muttype_index(self):
-        filename = self.filepath + "muttype_index.json"
-        muttype_index = self.parse_json(filename)
-        muttype_index = {int(k):v for k, v in muttype_index.items()}
-
-        return muttype_index
-
     @staticmethod
     def get_lines_from_file(filename):
         fin = open(filename)
@@ -127,3 +83,24 @@ class Importer(object):
         with open(filename, 'r') as fp:
             payload = json.load(fp)
         return payload
+
+    @staticmethod
+    def export_json(filename, data):
+        with open(filename, 'w') as f:
+            json.dump(data, f)
+
+    @staticmethod
+    def export_dict_to_tsv(filename, data):
+        nuclutieds = ['A', 'C', 'G', 'T']
+        text = ''
+        for key, values in data.items():
+            text += key + '\t'
+            for nuclutied in nuclutieds:
+                text += str(values[nuclutied]) + '\t'
+            text += '\n'
+
+        with open(filename, 'w') as f:
+            f.write(text)
+
+
+

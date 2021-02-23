@@ -1,0 +1,23 @@
+{
+"Ala": {"name": "Alanine", "sympole":"A", "hydropathy":"hydrophobic", "volume":"very_small", "chemical":"aliphatic", "charge":"uncharged", "polarity":"nonpolar", "hydrogen_donor_or_acceptor":"none"  },
+"Arg": {"name": "Arginine", "sympole":"R", "hydropathy":"hydrophilic", "volume":"large", "chemical":"basic", "charge":"positive_charged", "polarity":"polar", "hydrogen_donor_or_acceptor":"donor"  },
+"Asn": {"name": "Asparagine", "sympole":"N", "hydropathy":"hydrophilic", "volume":"small", "chemical":"amide", "charge":"uncharged", "polarity":"polar", "hydrogen_donor_or_acceptor":"donor_and_acceptor"  },
+"Asp": {"name": "Aspartic_acid", "sympole":"D", "hydropathy":"hydrophilic", "volume":"small", "chemical":"acidic", "charge":"negative_charged", "polarity":"polar", "hydrogen_donor_or_acceptor":"acceptor"  },
+"Cys": {"name": "Cysteine", "sympole":"C", "hydropathy":"hydrophobic", "volume":"small", "chemical":"sulfur", "charge":"uncharged", "polarity":"nonpolar", "hydrogen_donor_or_acceptor":"none"  },
+"Gln": {"name": "Glutamine", "sympole":"Q", "hydropathy":"hydrophilic", "volume":"medium", "chemical":"amide", "charge":"uncharged", "polarity":"polar", "hydrogen_donor_or_acceptor":"donor_and_acceptor"  },
+"Glu": {"name": "Glutamic_acid", "sympole":"E", "hydropathy":"hydrophilic", "volume":"medium", "chemical":"acidic", "charge":"negative_charged", "polarity":"polar", "hydrogen_donor_or_acceptor":"acceptor"  },
+"Gly": {"name": "Glycine", "sympole":"G", "hydropathy":"neutral", "volume":"very_small", "chemical":"aliphatic", "charge":"uncharged", "polarity":"nonpolar", "hydrogen_donor_or_acceptor":"none"  },
+"His": {"name": "Histidine", "sympole":"H", "hydropathy":"neutral", "volume":"medium", "chemical":"basic", "charge":"positive_charged", "polarity":"polar", "hydrogen_donor_or_acceptor":"donor_and_acceptor"  },
+"Ile": {"name": "Isoleucine", "sympole":"I", "hydropathy":"hydrophobic", "volume":"large", "chemical":"aliphatic", "charge":"uncharged", "polarity":"nonpolar", "hydrogen_donor_or_acceptor":"none"  },
+"Leu": {"name": "Leucine", "sympole":"L", "hydropathy":"hydrophobic", "volume":"large", "chemical":"aliphatic", "charge":"uncharged", "polarity":"nonpolar", "hydrogen_donor_or_acceptor":"none"  },
+"Lys": {"name": "Lysine", "sympole":"K", "hydropathy":"hydrophilic", "volume":"large", "chemical":"basic", "charge":"positive_charged", "polarity":"polar", "hydrogen_donor_or_acceptor":"donor"  },
+"Met": {"name": "Methionine", "sympole":"M", "hydropathy":"hydrophobic", "volume":"large", "chemical":"sulfur", "charge":"uncharged", "polarity":"nonpolar", "hydrogen_donor_or_acceptor":"none"  },
+"Phe": {"name": "Phenylalanine", "sympole":"F", "hydropathy":"hydrophobic", "volume":"very_large", "chemical":"aromatic", "charge":"uncharged", "polarity":"nonpolar", "hydrogen_donor_or_acceptor":"none"  },
+"Pro": {"name": "Proline", "sympole":"P", "hydropathy":"neutral", "volume":"small", "chemical":"aliphatic", "charge":"uncharged", "polarity":"nonpolar", "hydrogen_donor_or_acceptor":"none"  },
+"Ser": {"name": "Serine", "sympole":"S", "hydropathy":"neutral", "volume":"very_small", "chemical":"hydroxyl", "charge":"uncharged", "polarity":"polar", "hydrogen_donor_or_acceptor":"donor_and_acceptor"  },
+"Thr": {"name": "Threonine", "sympole":"T", "hydropathy":"neutral", "volume":"small", "chemical":"hydroxyl", "charge":"uncharged", "polarity":"polar", "hydrogen_donor_or_acceptor":"donor_and_acceptor"  },
+"Trp": {"name": "Tryptophan", "sympole":"W", "hydropathy":"hydrophobic", "volume":"very_large", "chemical":"aromatic", "charge":"uncharged", "polarity":"nonpolar", "hydrogen_donor_or_acceptor":"donor"  },
+"Tyr": {"name": "Tyrosine", "sympole":"Y", "hydropathy":"neutral", "volume":"very_large", "chemical":"aromatic", "charge":"uncharged", "polarity":"polar", "hydrogen_donor_or_acceptor":"donor_and_acceptor"  },
+"Val": {"name": "Valine", "sympole":"V", "hydropathy":"hydrophobic", "volume":"medium", "chemical":"aliphatic", "charge":"uncharged", "polarity":"nonpolar", "hydrogen_donor_or_acceptor":"none"  }
+
+}

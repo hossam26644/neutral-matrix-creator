@@ -116,12 +116,15 @@ class Interpreter(Seq):
 
             else:
                 base_ref_index = pointer + contig.strt_pos
-                self.add_codon(ref_codon, alg_codon, pentamer, exon, base_ref_index)
+                self.add_codon(ref_codon, alg_codon, pentamer, exon)
                 pointer += 3
 
-    def add_codon(self, ref_codon, alg_codon, pentamer, exon, base_ref_index):
+    def add_codon(self, ref_codon, alg_codon, pentamer, exon):
 
-        if "-" in alg_codon or "X" in alg_codon:
+        if "-" in alg_codon or "X" in alg_codon or "N" in alg_codon:
+            return
+
+        if "-" in ref_codon or "X" in ref_codon or "N" in ref_codon:
             return
 
 
@@ -137,13 +140,8 @@ class Interpreter(Seq):
 
         if alg_codon != ref_codon: #mutation
 
-            mut_type = self.get_mutation_type(ref_codon, alg_codon)
-            self.mutations_count[mut_type] += 1
-
-
-            if mut_type == "coding-synon":
-                self.mutation_number += 1
-                self.add_codon_to_neutral_matrix(ref_codon, alg_codon, pentamer, exon)
+            self.mutation_number += 1
+            self.add_codon_to_neutral_matrix(ref_codon, alg_codon, pentamer, exon)
 
     @classmethod
     def get_contig_pointer_by_exon(cls, contig, exon):
@@ -191,15 +189,11 @@ class Interpreter(Seq):
         gets a pentamer, adds the trinucleotides occurences to neutral matrix
         based on their possibility to mutate synonymsly
         '''
-        codon = pentamer[1:-1]
-        count = 0
-        for variant in self.syn_variants_dict[codon]:
-            if self.get_hamming_distance(codon, variant) == 1: #don't consider double mutants
-                count = 1
-                mutant_base, mutant_index = self.get_mutant_base_and_its_index(codon, variant)
-                context = pentamer[mutant_index:mutant_index+3]
-                self.trinucleotides_occurences[context][mutant_base] += 1
-        self.tri_num += count
+        for i in range(3):
+            codon = pentamer[i:i+3]
+            for mutant_base in ['A', 'C', 'G', 'T']:
+                self.trinucleotides_occurences[codon][mutant_base] += 1
+                self.tri_num += 1
 
     def add_codon_to_neutral_matrix(self, ref_codon, alg_codon, pentamer, exon):
         """

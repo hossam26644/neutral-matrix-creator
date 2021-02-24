@@ -13,11 +13,11 @@ class Exon(object):
 
         direction = line[6]
         if direction == "+":
-            self.def_strt_end_postn_pstv(line[3], line[4], line[7])
+            self.def_strt_end_postn_pstv(line[3], line[4], 0)
             self.negative_strand = False
 
         elif direction == "-":
-            self.def_strt_end_postn_ngtv(line[3], line[4], line[7])
+            self.def_strt_end_postn_ngtv(line[3], line[4], 0)
             self.negative_strand = True
 
         #self.gene_name = self.gene_name + str(self.start_position)
@@ -41,8 +41,11 @@ class Exon(object):
         """
         docstring
         """
-        gene_name = line8.split()[1]
-        return gene_name[1:-2] #remove semicolon and qutation marks
+        try:
+            gene_name = line8.split()[1]
+            return gene_name[1:-2] #remove semicolon and qutation marks
+        except IndexError:
+            return "non coding"
 
     def __eq__(self, other):
         """

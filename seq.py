@@ -107,3 +107,31 @@ class Seq(object):
             contexts.append(pentamer[i:i+3])
 
         return contexts
+
+    @staticmethod
+    def get_lines_from_file(filename):
+        fin = open(filename)
+        lines = fin.readlines()
+        fin.close()
+        return lines
+
+    @staticmethod
+    def get_row_col_by_pos(pos=int):
+        row = 1 + (pos//50)
+        col = (pos%50) - 1
+        if col == -1:
+            row -= 1
+            col = 49
+        return row, col
+
+    @staticmethod
+    def get_base_by_pos(ref, pos=int):
+        row, col = Seq.get_row_col_by_pos(pos)
+        return ref[row][col]
+
+    @staticmethod
+    def get_context_by_pos(ref, pos=int):
+        base0 = Seq.get_base_by_pos(ref, pos-1).upper()
+        base1 = Seq.get_base_by_pos(ref, pos).upper()
+        base2 = Seq.get_base_by_pos(ref, pos+1).upper()
+        return ([base0, base1, base2])

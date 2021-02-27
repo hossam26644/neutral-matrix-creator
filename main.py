@@ -18,6 +18,11 @@ class Interpreter(Seq):
         self.trinucleotides_occurences = self.generate_empty_params()
         self.neutral_matrix = self.generate_empty_params()
 
+        self.recombinations_marked = Seq.get_lines_from_file("recombinationhotspots_padded.txt")
+        self.cpg_marked = Seq.get_lines_from_file("CpGIslandspaddedchr1.txt")
+        self.ref = Seq.get_lines_from_file("chr1.fa")
+
+        self.error = 0
         annotations = Importer.get_lines_from_file(annotations_file)
         exons = self.extract_exons_from_annotations(annotations)
 
@@ -28,6 +33,8 @@ class Interpreter(Seq):
 
         self.normalize_neutral_matrix()
         Importer.export_dict_to_tsv("normalized_matrix.txt", self.neutral_matrix)
+
+        print(self.error)
 
         print('mutability:' + '\t' + str(self.mutation_number/float(self.tri_num)))
         print('mutations number:' + '\t' + str(self.mutation_number))
@@ -44,7 +51,7 @@ class Interpreter(Seq):
 
         for idx, line in enumerate(annotation_lines):
             line = line.split('\t')
-            if line[2] == "flanking_exon":
+            if line[2] in ["5UTR", "flanking_exon"]:
                 exon = Exon(line)
                 exons.add_exon(exon)
 
@@ -103,9 +110,14 @@ class Interpreter(Seq):
                          (contig.length - 4))
 
         while pointer < stop_point:
+            base_ref_index = pointer + contig.strt_pos
+
             ref_codon = contig.ref_seq[pointer:pointer+3]
             pentamer = contig.ref_seq[pointer-1:pointer+4]
             alg_codon = contig.alg_seq[pointer:pointer+3]
+
+            if ref_codon[0] != Seq.get_base_by_pos(self.ref, base_ref_index).upper():
+                self.error += 1
 
             if "-" in ref_codon: #has insertion, unrechable now as we remove gaps first
                 gap_index = pointer + ref_codon.index("-")
@@ -115,9 +127,11 @@ class Interpreter(Seq):
                 continue
 
             else:
-                base_ref_index = pointer + contig.strt_pos
-                self.add_codon(ref_codon, alg_codon, pentamer, exon)
+                if Seq.get_base_by_pos(self.cpg_marked, base_ref_index) == 'X':
+                    self.add_codon(ref_codon, alg_codon, pentamer, exon)
                 pointer += 3
+
+
 
     def add_codon(self, ref_codon, alg_codon, pentamer, exon):
 

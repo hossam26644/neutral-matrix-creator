@@ -8,32 +8,42 @@ from importer import Importer
 
 class Interpreter(Seq):
 
-    def __init__(self, maf_file, annotations_file):
+    def __init__(self, maf_file, annotations_file, regions_names):
 
         Seq.__init__(self)
 
-        self.tri_num = 0
-        self.mutation_number = 0
-
-        self.trinucleotides_occurences = self.generate_empty_params()
-        self.neutral_matrix = self.generate_empty_params()
-
         annotations = Importer.get_lines_from_file(annotations_file)
-        exons = self.extract_exons_from_annotations(annotations)
-
         maf_file = Importer.get_lines_from_file(maf_file)
-        self.analyse_maf_file(maf_file, exons)
-        Importer.export_dict_to_tsv("tri_occ.txt", self.trinucleotides_occurences)
-        Importer.export_dict_to_tsv("mutations.txt", self.neutral_matrix)
 
-        self.normalize_neutral_matrix()
-        Importer.export_dict_to_tsv("normalized_matrix.txt", self.neutral_matrix)
 
-        print('mutability:' + '\t' + str(self.mutation_number/float(self.tri_num)))
-        print('mutations number:' + '\t' + str(self.mutation_number))
-        print('trin number:' + '\t' + str(self.tri_num))
+        for region_name in regions_names:
+            print(region_name)
+            self.tri_num = 0
+            self.mutation_number = 0
 
-    def extract_exons_from_annotations(self, annotation_lines):
+            self.trinucleotides_occurences = self.generate_empty_params()
+            self.neutral_matrix = self.generate_empty_params()
+
+            regions = self.extract_regions_from_annotations(annotations, region_name)
+
+            self.analyse_maf_file(maf_file, regions)
+            #Importer.export_dict_to_tsv("tri_occ.txt", self.trinucleotides_occurences)
+            #Importer.export_dict_to_tsv("mutations.txt", self.neutral_matrix)
+
+            self.normalize_neutral_matrix()
+            matrix_file_name = "neutral_matrices/" + region_name + "_normalized_matrix.txt"
+            Importer.export_dict_to_tsv(matrix_file_name, self.neutral_matrix)
+
+
+            logs_file_name = "neutral_matrices/" + region_name + "_logs.txt"
+            logs = 'mutability:' + '\t' + str(self.mutation_number/float(self.tri_num)) + '\n'
+            logs += 'mutations number:' + '\t' + str(self.mutation_number) + '\n'
+            logs += 'trin number:' + '\t' + str(self.tri_num) + '\n'
+            Importer.export_text(logs_file_name, logs)
+
+
+
+    def extract_regions_from_annotations(self, annotation_lines, region_name):
         ''' gets the annotation file lines
             returns a dictionary of exons positions, keys are the start position
             value is a list [start_pos, end_pos, chromosome,
@@ -44,7 +54,7 @@ class Interpreter(Seq):
 
         for idx, line in enumerate(annotation_lines):
             line = line.split('\t')
-            if line[2] == "CDS":
+            if line[2] == region_name:
                 exon = Exon(line)
                 exons.add_exon(exon)
 
@@ -212,4 +222,6 @@ class Interpreter(Seq):
 
 
 
-Interpreter("small.maf", "chr1regionsannotator.gtf")
+Interpreter("mrca_mult.maf", "hg38Regionsannotations.gtf", ["first_coding_exon",
+                                                        "last_coding_exon",
+                                                        "internal_exon"])

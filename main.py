@@ -23,7 +23,15 @@ class Interpreter(Seq):
 
         maf_file = Importer.get_lines_from_file(maf_file)
         self.analyse_maf_file(maf_file, exons)
+        Importer.export_dict_to_tsv("tri_occ.txt", self.trinucleotides_occurences)
+        Importer.export_dict_to_tsv("mutations.txt", self.neutral_matrix)
 
+        self.normalize_neutral_matrix()
+        Importer.export_dict_to_tsv("normalized_matrix.txt", self.neutral_matrix)
+
+        print('mutability:' + '\t' + str(self.mutation_number/float(self.tri_num)))
+        print('mutations number:' + '\t' + str(self.mutation_number))
+        print('trin number:' + '\t' + str(self.tri_num))
 
     def extract_exons_from_annotations(self, annotation_lines):
         ''' gets the annotation file lines

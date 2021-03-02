@@ -39,3 +39,8 @@ class Importer(object):
 
         with open(filename, 'w') as f:
             f.write(text)
+
+    @staticmethod
+    def export_text(filename, text):
+        with open(filename, 'w') as f:
+            f.write(text)

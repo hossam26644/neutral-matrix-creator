@@ -1,2 +1,6 @@
 *.gtf
 *.maf
+*.fa
+*.pyc
+*.txt
+results

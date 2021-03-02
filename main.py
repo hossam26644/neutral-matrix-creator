@@ -44,7 +44,7 @@ class Interpreter(Seq):
 
         for idx, line in enumerate(annotation_lines):
             line = line.split('\t')
-            if line[2] == "CDS":
+            if line[2] == "flanking_exon":
                 exon = Exon(line)
                 exons.add_exon(exon)
 
@@ -134,16 +134,15 @@ class Interpreter(Seq):
 
         #self.mutations_table.add_context(exon.gene_name, pentamer) #flux analysis
 
-        self.tri_num += 1
 
         if alg_codon != ref_codon: #mutation
-            self.mutation_number += 1
 
             mut_type = self.get_mutation_type(ref_codon, alg_codon)
             self.mutations_count[mut_type] += 1
 
 
             if mut_type == "coding-synon":
+                self.mutation_number += 1
                 self.add_codon_to_neutral_matrix(ref_codon, alg_codon, pentamer, exon)
 
     @classmethod
@@ -193,12 +192,14 @@ class Interpreter(Seq):
         based on their possibility to mutate synonymsly
         '''
         codon = pentamer[1:-1]
-
+        count = 0
         for variant in self.syn_variants_dict[codon]:
             if self.get_hamming_distance(codon, variant) == 1: #don't consider double mutants
+                count = 1
                 mutant_base, mutant_index = self.get_mutant_base_and_its_index(codon, variant)
                 context = pentamer[mutant_index:mutant_index+3]
                 self.trinucleotides_occurences[context][mutant_base] += 1
+        self.tri_num += count
 
     def add_codon_to_neutral_matrix(self, ref_codon, alg_codon, pentamer, exon):
         """
@@ -212,4 +213,4 @@ class Interpreter(Seq):
 
 
 
-Interpreter("small.maf", "chr1regionsannotator.gtf")
+Interpreter("mrca_mult.maf", "chr1regionsannotator.gtf")

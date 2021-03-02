@@ -7,7 +7,7 @@ import sys
 class Importer(object):
 
     def __init__(self, filepath):
-        self.filepath = "./" + filepath + "/"
+        self.filepath = ""
 
     @staticmethod
     def get_lines_from_file(filename):

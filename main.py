@@ -27,20 +27,10 @@ class Interpreter(Seq):
             regions = self.extract_regions_from_annotations(annotations, region_name)
 
             self.analyse_maf_file(maf_file, regions)
-            #Importer.export_dict_to_tsv("tri_occ.txt", self.trinucleotides_occurences)
-            #Importer.export_dict_to_tsv("mutations.txt", self.neutral_matrix)
 
+            self.export_tri_occ_and_mutations(region_name)
             self.normalize_neutral_matrix()
-            matrix_file_name = "neutral_matrices/" + region_name + "_normalized_matrix.txt"
-            Importer.export_dict_to_tsv(matrix_file_name, self.neutral_matrix)
-
-
-            logs_file_name = "neutral_matrices/" + region_name + "_logs.txt"
-            logs = 'mutability:' + '\t' + str(self.mutation_number/float(self.tri_num)) + '\n'
-            logs += 'mutations number:' + '\t' + str(self.mutation_number) + '\n'
-            logs += 'trin number:' + '\t' + str(self.tri_num) + '\n'
-            Importer.export_text(logs_file_name, logs)
-
+            self.export_results(region_name)
 
 
     def extract_regions_from_annotations(self, annotation_lines, region_name):
@@ -221,8 +211,23 @@ class Interpreter(Seq):
             #self.mutations_table.add_mutation(trin, ref_codon, alg_codon, exon.gene_name)
             self.neutral_matrix[trin][base] += 1
 
+    def export_results(self, region_name):
+        matrix_file_name = "neutral_matrices/" + region_name + "_normalized_matrix.txt"
+        Importer.export_dict_to_tsv(matrix_file_name, self.neutral_matrix)
 
 
-Interpreter("mrca_mult.maf", "hg38Regionsannotations.gtf", ["first_coding_exon",
-                                                        "last_coding_exon",
-                                                        "internal_exon"])
+        logs_file_name = "neutral_matrices/" + region_name + "_logs.txt"
+        logs = 'mutability:' + '\t' + str(self.mutation_number/float(self.tri_num)) + '\n'
+        logs += 'mutations number:' + '\t' + str(self.mutation_number) + '\n'
+        logs += 'trin number:' + '\t' + str(self.tri_num) + '\n'
+        Importer.export_text(logs_file_name, logs)
+
+    def export_tri_occ_and_mutations(self, region_name):
+        prefix = "neutral_matrices/" + region_name + '_'
+        Importer.export_dict_to_tsv(prefix + "tri_occ.txt", self.trinucleotides_occurences)
+        Importer.export_dict_to_tsv(prefix + "mutations.txt", self.neutral_matrix)
+
+
+Interpreter("MRCA_mult_full.maf", "hg38Regionsannotations.gtf", ["internal_exon",
+                                                                 "first_coding_exon",
+                                                                 "last_coding_exon"])

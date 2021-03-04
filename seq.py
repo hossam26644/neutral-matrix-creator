@@ -107,3 +107,8 @@ class Seq(object):
             contexts.append(pentamer[i:i+3])
 
         return contexts
+
+    @staticmethod
+    def export_matrix(region_name, matrix_type, matrix):
+        file_name = "neutral_matrices/" + region_name + '_' + matrix_type + ".txt"
+        Importer.export_dict_to_tsv(file_name, matrix)

@@ -74,7 +74,7 @@ class ExonsList(object):
     def __init__(self):
         self.exons_by_chrom = {}
         self.strt_position_by_chrom = {}
-        self.strt_position_by_chrom2 = {}
+        self.end_position_by_chrom = {}
 
     def add_exon(self, exon):
 
@@ -82,13 +82,13 @@ class ExonsList(object):
             if exon.start_position not in self.strt_position_by_chrom[exon.chrom]:
                 self.exons_by_chrom[exon.chrom][exon.start_position] = exon
                 bisect.insort(self.strt_position_by_chrom[exon.chrom], exon.start_position)
-                bisect.insort(self.strt_position_by_chrom2[exon.chrom], exon.start_position)
+                bisect.insort(self.end_position_by_chrom[exon.chrom], exon.end_position)
             else:
                 return
         else:
             self.exons_by_chrom[exon.chrom] = {exon.start_position:exon}
             self.strt_position_by_chrom[exon.chrom] = [exon.start_position]
-            self.strt_position_by_chrom2[exon.chrom] = [exon.start_position]
+            self.end_position_by_chrom[exon.chrom] = [exon.end_position]
 
     def get_first_exon(self, chrom):
         frst_strt_pos = self.strt_position_by_chrom[chrom][0]

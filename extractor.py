@@ -5,6 +5,7 @@ from contig import Contig
 from exon import Exon, ExonsList, NoMoreExons
 from seq import Seq
 from importer import Importer
+from excludedregions import ExcludedRegions
 
 class Extractor(Seq):
 
@@ -20,8 +21,9 @@ class Extractor(Seq):
         self.trinucleotides_occurences = None
         self.neutral_matrix = None
         self.logs = ''
+        self.excluded_regions = ExcludedRegions()
 
-    def extract_mutational_matrix(self, region_name, coding=True):
+    def extract_mutational_matrix(self, region_name, coding=True, excluded_regions=None):
 
         print(region_name)
         self.tri_num = 0
@@ -31,8 +33,11 @@ class Extractor(Seq):
         self.trinucleotides_occurences = self.generate_empty_params()
         self.neutral_matrix = self.generate_empty_params()
 
+        self.check_excluded_regions(excluded_regions)
+
         print('extracting annotations')
         regions = self.extract_regions_from_annotations(self.annotations, region_name)
+
 
         print('analysing sequence')
         self.analyse_maf_file(self.maf_file, regions)
@@ -43,6 +48,16 @@ class Extractor(Seq):
         self.update_logs(region_name)
         print()
         return(self.neutral_matrix, mutations, occurences)
+
+    def check_excluded_regions(self, excluded_regions):
+        self.excluded_regions = ExcludedRegions()
+        if excluded_regions is None:
+            return
+        else:
+            for region_name, filename in excluded_regions.items():
+                lines = Importer.get_lines_from_file(filename)
+                regions = self.extract_regions_from_annotations(lines, region_name)
+                self.excluded_regions.add_regions(regions)
 
     def extract_regions_from_annotations(self, annotation_lines, region_name):
         ''' gets the annotation file lines
@@ -132,6 +147,9 @@ class Extractor(Seq):
 
     def add_codon(self, ref_codon, alg_codon, pentamer, exon, base_ref_index):
 
+        if not self.excluded_regions.is_excluded(exon.chrom, base_ref_index):
+            return
+
         if self.check_region_not_available(ref_codon, alg_codon, pentamer):
             return
 
@@ -200,7 +218,7 @@ class Extractor(Seq):
             codon = pentamer[i:i+3]
             for mutant_base in ['A', 'C', 'G', 'T']:
                 self.trinucleotides_occurences[codon][mutant_base] += 1
-                self.tri_num += 1
+            self.tri_num += 1
 
 
     def add_trinucleotides_occurences_coding(self, pentamer):

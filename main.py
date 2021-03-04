@@ -121,9 +121,8 @@ class Interpreter(Seq):
 
     def add_codon(self, ref_codon, alg_codon, pentamer, exon, base_ref_index):
 
-        if "-" in alg_codon or "X" in alg_codon:
+        if self.check_region_not_available(ref_codon, alg_codon, pentamer):
             return
-
 
         if exon.negative_strand: #negative strand
             ref_codon = self.get_reverse_complement(ref_codon)
@@ -227,6 +226,11 @@ class Interpreter(Seq):
         Importer.export_dict_to_tsv(prefix + "tri_occ.txt", self.trinucleotides_occurences)
         Importer.export_dict_to_tsv(prefix + "mutations.txt", self.neutral_matrix)
 
+    def check_region_not_available(self, *args):
+        for arg in args:
+            if "-" in arg or "X" in arg or "N" in arg:
+                return True
+        return False
 
 Interpreter("mrca_mult.maf", "hg38Regionsannotations.gtf", ["Intergenic", "internal_exon",
                                                                  "first_coding_exon",

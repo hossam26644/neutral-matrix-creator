@@ -16,7 +16,6 @@ class Interpreter(Seq):
         annotations = Importer.get_lines_from_file(annotations_file)
         maf_file = Importer.get_lines_from_file(maf_file)
 
-
         for region_name in regions_names:
             print(region_name)
             self.tri_num = 0
@@ -25,13 +24,16 @@ class Interpreter(Seq):
             self.trinucleotides_occurences = self.generate_empty_params()
             self.neutral_matrix = self.generate_empty_params()
 
+            print('extracting annotations')
             regions = self.extract_regions_from_annotations(annotations, region_name)
 
+            print('analysing sequence')
             self.analyse_maf_file(maf_file, regions)
 
             self.export_tri_occ_and_mutations(region_name)
             self.normalize_neutral_matrix()
             self.export_results(region_name)
+            print()
 
 
     def extract_regions_from_annotations(self, annotation_lines, region_name):

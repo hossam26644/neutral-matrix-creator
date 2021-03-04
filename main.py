@@ -228,6 +228,6 @@ class Interpreter(Seq):
         Importer.export_dict_to_tsv(prefix + "mutations.txt", self.neutral_matrix)
 
 
-Interpreter("MRCA_mult_full.maf", "hg38Regionsannotations.gtf", ["internal_exon",
+Interpreter("mrca_mult.maf", "hg38Regionsannotations.gtf", ["Intergenic", "internal_exon",
                                                                  "first_coding_exon",
                                                                  "last_coding_exon"])

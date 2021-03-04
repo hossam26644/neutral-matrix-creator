@@ -12,15 +12,22 @@ class Exon(object):
         self.chrom = line[0]
 
         direction = line[6]
+        frame = self.get_frame(line[7])
+
         if direction == "+":
-            self.def_strt_end_postn_pstv(line[3], line[4], line[7])
+            self.def_strt_end_postn_pstv(line[3], line[4], frame)
             self.negative_strand = False
 
         elif direction == "-":
-            self.def_strt_end_postn_ngtv(line[3], line[4], line[7])
+            self.def_strt_end_postn_ngtv(line[3], line[4], frame)
             self.negative_strand = True
 
         #self.gene_name = self.gene_name + str(self.start_position)
+
+    def get_frame(self, frame):
+        if frame in ['0', '1', '2']:
+            return frame
+        return '0'
 
     def def_strt_end_postn_pstv(self, strt_pos, end_pos, frame):
         """
@@ -41,8 +48,13 @@ class Exon(object):
         """
         docstring
         """
-        gene_name = line8.split()[1]
-        return gene_name[1:-2] #remove semicolon and qutation marks
+        try:
+            gene_name = line8.split()[1]
+            gene_name = gene_name[1:-2] #remove semicolon and qutation marks
+        except IndexError:
+            gene_name = 'Not_a_gene'
+
+        return gene_name
 
     def __eq__(self, other):
         """

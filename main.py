@@ -8,10 +8,11 @@ from importer import Importer
 
 class Interpreter(Seq):
 
-    def __init__(self, maf_file, annotations_file, regions_names):
+    def __init__(self, maf_file, annotations_file, regions_names, coding=True):
 
         Seq.__init__(self)
 
+        self.coding = coding
         annotations = Importer.get_lines_from_file(annotations_file)
         maf_file = Importer.get_lines_from_file(maf_file)
 
@@ -131,18 +132,9 @@ class Interpreter(Seq):
 
         self.add_trinucleotides_occurences(pentamer)
 
-        #self.mutations_table.add_context(exon.gene_name, pentamer) #flux analysis
-
-
         if alg_codon != ref_codon: #mutation
+            self.add_codon_to_neutral_matrix(ref_codon, alg_codon, pentamer, exon)
 
-            mut_type = self.get_mutation_type(ref_codon, alg_codon)
-            self.mutations_count[mut_type] += 1
-
-
-            if mut_type == "coding-synon":
-                self.mutation_number += 1
-                self.add_codon_to_neutral_matrix(ref_codon, alg_codon, pentamer, exon)
 
     @classmethod
     def get_contig_pointer_by_exon(cls, contig, exon):
@@ -186,6 +178,22 @@ class Interpreter(Seq):
                     float(self.trinucleotides_occurences[context][base])
 
     def add_trinucleotides_occurences(self, pentamer):
+        ''' calls the coding or the noncoding method to calculate trin occ'''
+        if self.coding:
+            self.add_trinucleotides_occurences_coding(pentamer)
+        else:
+            self.add_trinucleotides_occurences_noncoding(pentamer)
+
+    def add_trinucleotides_occurences_noncoding(self, pentamer):
+        '''all posiible mutation locations are added'''
+        for i in range(3):
+            codon = pentamer[i:i+3]
+            for mutant_base in ['A', 'C', 'G', 'T']:
+                self.trinucleotides_occurences[codon][mutant_base] += 1
+                self.tri_num += 1
+
+
+    def add_trinucleotides_occurences_coding(self, pentamer):
         '''
         gets a pentamer, adds the trinucleotides occurences to neutral matrix
         based on their possibility to mutate synonymsly
@@ -204,11 +212,13 @@ class Interpreter(Seq):
         """
         docstring
         """
-        if self.get_hamming_distance(ref_codon, alg_codon) == 1: #don't consider double mutants
-            base, idx = self.get_mutant_base_and_its_index(ref_codon, alg_codon)
-            trin = pentamer[idx: idx+3]
-            #self.mutations_table.add_mutation(trin, ref_codon, alg_codon, exon.gene_name)
-            self.neutral_matrix[trin][base] += 1
+        if (not self.coding) or self.get_mutation_type(ref_codon, alg_codon) == "coding-synon":
+            self.mutation_number += 1
+
+            if self.get_hamming_distance(ref_codon, alg_codon) == 1: #don't consider double mutants
+                base, idx = self.get_mutant_base_and_its_index(ref_codon, alg_codon)
+                trin = pentamer[idx: idx+3]
+                self.neutral_matrix[trin][base] += 1
 
     def export_results(self, region_name):
         matrix_file_name = "neutral_matrices/" + region_name + "_normalized_matrix.txt"
@@ -232,6 +242,4 @@ class Interpreter(Seq):
                 return True
         return False
 
-Interpreter("mrca_mult.maf", "hg38Regionsannotations.gtf", ["Intergenic", "internal_exon",
-                                                                 "first_coding_exon",
-                                                                 "last_coding_exon"])
+Interpreter("mrca_mult.maf", "hg38Regionsannotations.gtf", ["Intergenic"], False)

@@ -1,5 +1,5 @@
 import bisect
-
+import re
 
 class Exon(object):
     """
@@ -10,6 +10,7 @@ class Exon(object):
 
         self.gene_name = self._get_gene_name(line[8])
         self.chrom = line[0]
+        self.replication_dir = self.get_repli_dir(line[8])
 
         direction = line[6]
         frame = self.get_frame(line[7])
@@ -44,17 +45,25 @@ class Exon(object):
         self.start_position = int(strt_pos)
         self.end_position = int(end_pos) - int(frame) - 2
 
-    def _get_gene_name(self, line8):
-        """
-        docstring
-        """
-        try:
-            gene_name = line8.split()[1]
-            gene_name = gene_name[1:-2] #remove semicolon and qutation marks
-        except IndexError:
-            gene_name = 'Not_a_gene'
+    def _get_gene_name(self, line):
 
-        return gene_name
+        attrs = line.split(";")[:-1]
+        for attr in attrs:
+            attr = attr.split()
+            if attr[0] == "gene_name":
+                return re.sub('\"', '', attr[1])
+
+        return 'Not_a_gene'
+
+    def get_repli_dir(self, line):
+
+        attrs = line.split(";")[:-1]
+        for attr in attrs:
+            attr = attr.split()
+            if attr[0:1] == "replication strand":
+                return re.sub('\"', '', attr[-1])
+
+        return 'no dir'
 
     def __eq__(self, other):
         """
@@ -74,7 +83,7 @@ class ExonsList(object):
     def __init__(self):
         self.exons_by_chrom = {}
         self.strt_position_by_chrom = {}
-        self.strt_position_by_chrom2 = {}
+        self.end_position_by_chrom = {}
 
     def add_exon(self, exon):
 
@@ -82,13 +91,13 @@ class ExonsList(object):
             if exon.start_position not in self.strt_position_by_chrom[exon.chrom]:
                 self.exons_by_chrom[exon.chrom][exon.start_position] = exon
                 bisect.insort(self.strt_position_by_chrom[exon.chrom], exon.start_position)
-                bisect.insort(self.strt_position_by_chrom2[exon.chrom], exon.start_position)
+                bisect.insort(self.end_position_by_chrom[exon.chrom], exon.end_position)
             else:
                 return
         else:
             self.exons_by_chrom[exon.chrom] = {exon.start_position:exon}
             self.strt_position_by_chrom[exon.chrom] = [exon.start_position]
-            self.strt_position_by_chrom2[exon.chrom] = [exon.start_position]
+            self.end_position_by_chrom[exon.chrom] = [exon.end_position]
 
     def get_first_exon(self, chrom):
         frst_strt_pos = self.strt_position_by_chrom[chrom][0]

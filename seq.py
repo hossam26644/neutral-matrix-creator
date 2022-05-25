@@ -1,6 +1,8 @@
 import sys
 from importer import Importer
 
+BASES = ['A', 'C', 'G', 'T']
+CONTEXTS = [x+y+z for x in BASES for y in BASES for z in BASES]
 
 class Seq(object):
     """
@@ -11,16 +13,10 @@ class Seq(object):
         self.mutations_count = {"coding-synon":0, "nonsense":0, "missense":0}
         self.possible_syn_counts_table = self.generate_possible_syn_mutations_counts_table()
         self.syn_variants_dict = self.get_syn_variants_dict()
-        self.bases = ["A", "C", "G", "T"]
 
-    @classmethod
-    def get_reverse_complement(cls, sequence):
-        complement = {'A':'T', 'C':'G', 'G':'C', 'T':'A'}
-        rev_comp = ""
-        for base in reversed(sequence):
-            rev_comp += complement[base]
-
-        return rev_comp
+    @staticmethod
+    def get_reverse_complement(seq):
+        return seq.translate(str.maketrans('ATCG', 'TAGC'))[::-1]
 
     def get_mutation_type(self, ref_codon, alg_codon):
 
@@ -107,3 +103,10 @@ class Seq(object):
             contexts.append(pentamer[i:i+3])
 
         return contexts
+
+    @staticmethod
+    def check_region_not_available(*args):
+        for arg in args:
+            if "-" in arg or "X" in arg or "N" in arg:
+                return True
+        return False

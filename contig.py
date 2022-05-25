@@ -1,3 +1,4 @@
+import requests
 
 class Contig(object):
 
@@ -21,7 +22,7 @@ class Contig(object):
         if self.got_ref and self.got_alg:
 
             while idx < len(self.ref_seq):
-                if self.ref_seq[idx] == "-":
+                if self.alg_seq[idx] == "-":
                     self.ref_seq.pop(idx)
                     self.alg_seq.pop(idx)
                 else:
@@ -29,10 +30,20 @@ class Contig(object):
 
             self.ref_seq = ("".join(self.ref_seq)).upper()
             self.alg_seq = ("".join(self.alg_seq)).upper()
+            #self.check_ref_seq()
+
             return True
 
         return False
         #return self.got_ref and self.got_alg
+
+    def check_ref_seq(self):
+        q = 'http://api.genome.ucsc.edu/getData/sequence?genome=hg38;'
+        q += 'chrom='+ self.chrom + ';start=' + str(self.strt_pos-1) +';end=' + str(self.end_pos-1)
+        result = requests.get(q)
+        result = result.json()
+        if result['dna'].upper() != self.ref_seq.upper():
+            print("shit")
 
     def add_line(self, line):
         line = line.split()
@@ -42,15 +53,15 @@ class Contig(object):
             if species == self.ref_spc:
                 self.got_ref = True
                 self.ref_seq = list(line[6])
+
+            elif species == self.alg_spc:
+                self.got_alg = True
+                self.alg_seq = list(line[6])
                 self.chrom = chrom
                 self.strt_pos = int(line[2])+1
                 self.end_pos = self.strt_pos + int(line[3])
                 self.length = self.end_pos - self.strt_pos
                 self.strand = line[4]
-
-            elif species == self.alg_spc:
-                self.got_alg = True
-                self.alg_seq = list(line[6])
 
     def is_before_exon(self, exon):
         return self.end_pos < exon.start_position
@@ -61,6 +72,9 @@ class Contig(object):
     def has_exon(self, exon):
         no_exon = self.is_before_exon(exon) or self.is_after_exon(exon)
         return not no_exon
+
+    def end_before_exon(self, exon):
+        return self.end_pos < exon.end_position
 
     @staticmethod
     def new_contig(line):
